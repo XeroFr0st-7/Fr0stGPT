@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Fr0st GPT</title>
+  <meta name="description" content="Fr0st GPT — your ideas, your intelligence, beyond the ordinary.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Logo sprite: a six-armed snowflake whose arm tips are neural-network nodes -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#a78bfa"/>
+      </linearGradient>
+    </defs>
+    <symbol id="logo" viewBox="0 0 48 48">
+      <g stroke="url(#lg)" stroke-width="2.6" stroke-linecap="round" fill="none">
+        <path d="M24 6v36M8.4 15l31.2 18M39.6 15L8.4 33"/>
+        <path d="M19 10l5 4 5-4M19 38l5-4 5 4"/>
+      </g>
+      <g fill="url(#lg)">
+        <circle cx="24" cy="24" r="4.5"/>
+        <circle cx="24" cy="5" r="2.6"/><circle cx="24" cy="43" r="2.6"/>
+        <circle cx="7.5" cy="14.5" r="2.6"/><circle cx="40.5" cy="33.5" r="2.6"/>
+        <circle cx="40.5" cy="14.5" r="2.6"/><circle cx="7.5" cy="33.5" r="2.6"/>
+      </g>
+    </symbol>
+  </svg>
+
+  <div class="bg" aria-hidden="true"></div>
+  <canvas id="snow" aria-hidden="true"></canvas>
+
+  <div class="app">
+    <!-- ===== Sidebar ===== -->
+    <aside id="sidebar" aria-label="Conversations">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo"/></svg>
+        <span class="brand-name">Fr0st GPT</span>
+      </div>
+      <button id="newChat" class="btn-new" type="button">+ New Chat</button>
+      <label class="search">
+        <span class="sr">Search conversations</span>
+        <input id="search" type="search" placeholder="Search chats..." autocomplete="off">
+      </label>
+      <nav id="convList" aria-label="Conversation history"></nav>
+      <div class="profile">
+        <div class="avatar me" aria-hidden="true">You</div>
+        <div class="who"><b>Guest</b><small id="modeSmall">Demo mode</small></div>
+        <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle light or dark theme">◐</button>
+        <button id="settingsBtn" class="icon-btn" type="button" aria-label="Open settings">⚙</button>
+      </div>
+    </aside>
+    <div id="overlay"></div>
+
+    <!-- ===== Main ===== -->
+    <main>
+      <header>
+        <button id="menuBtn" class="icon-btn" type="button" aria-label="Toggle sidebar" aria-controls="sidebar">☰</button>
+        <h1 id="title">Fr0st GPT</h1>
+      </header>
+
+      <div id="scroll">
+        <section id="welcome">
+          <div class="orb" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#logo"/></svg></div>
+          <h2>Welcome to Fr0st GPT</h2>
+          <p>Your ideas. Your intelligence. Beyond the ordinary.</p>
+          <div class="cards">
+            <button type="button" class="card" data-prompt="Write a short, atmospheric story about a lighthouse keeper at the edge of a frozen sea.">✨ Write something creative</button>
+            <button type="button" class="card" data-prompt="Generate a JavaScript debounce function with comments and a usage example.">💻 Generate code</button>
+            <button type="button" class="card" data-prompt="Explain quantum entanglement in simple terms with an analogy.">🧠 Explain a complex concept</button>
+            <button type="button" class="card" data-prompt="Brainstorm 5 startup ideas that combine AI with sustainability.">🚀 Brainstorm new ideas</button>
+          </div>
+        </section>
+        <div id="thread" role="log" aria-live="polite" aria-label="Messages"></div>
+      </div>
+
+      <form id="composer" autocomplete="off">
+        <div id="chips" class="chips"></div>
+        <div class="box">
+          <button id="attachBtn" class="icon-btn" type="button" aria-label="Attach a file">+</button>
+          <input id="file" type="file" multiple hidden>
+          <label class="sr" for="input">Message</label>
+          <textarea id="input" rows="1" maxlength="4000" placeholder="Ask Fr0st anything..."></textarea>
+          <button id="micBtn" class="icon-btn" type="button" aria-label="Dictate with microphone" aria-pressed="false">🎤</button>
+          <button id="stopBtn" class="send stop" type="button" aria-label="Stop generating" hidden>■</button>
+          <button id="sendBtn" class="send" type="submit" aria-label="Send message" disabled>↑</button>
+        </div>
+        <div class="meta"><span id="modeNote">Demo mode: add your Gemini API key in Settings for real AI.</span><span id="counter" hidden></span></div>
+      </form>
+    </main>
+  </div>
+
+  <!-- ===== Settings ===== -->
+  <dialog id="settings" aria-labelledby="settingsTitle">
+    <form method="dialog">
+      <div class="dlg-head"><h2 id="settingsTitle">Settings</h2><button type="submit" class="icon-btn" aria-label="Close settings">✕</button></div>
+      <div class="row"><span>Theme</span>
+        <div class="seg" id="themeSeg">
+          <button type="button" data-theme="dark">Dark</button><button type="button" data-theme="light">Light</button>
+        </div>
+      </div>
+      <div class="row"><span>Accent color</span><div id="accents" class="swatches"></div></div>
+      <label class="row"><span>Animations</span><input type="checkbox" id="animToggle"></label>
+      <label class="row"><span>Sound effects</span><input type="checkbox" id="soundToggle"></label>
+      <div class="row key"><label for="apiKeyInput">Gemini API key</label>
+        <div class="keybox"><input id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" spellcheck="false"><button type="button" id="saveKey" class="danger ok">Save</button></div>
+        <small>Stored only in this browser. Get one from Google AI Studio.</small></div>
+      <div class="row"><span>Chat history</span><button type="button" id="clearAll" class="danger">Clear all chats</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
